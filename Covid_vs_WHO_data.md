@@ -114,3 +114,4 @@ https://www.heritage.org/index/
 https://apps.who.int/gho/data/node.main.WSHHYGIENE?lang=en
 https://www.tutorialgateway.org/barplot-in-r-programming/
 http://howtoinr.weebly.com/
+https://www.r-graph-gallery.com/210-custom-barplot-layout
