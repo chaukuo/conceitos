@@ -1,20 +1,44 @@
+# Data description
+
+# Handwashing = Population with basic handwashing facilities at home (%)
+# Metadata: https://www.who.int/data/gho/indicator-metadata-registry/imr-details/4822
+# Governemnt integrity: Corruption erodes economic freedom by introducing insecurity and uncertainty into economic relationships
+# https://www.heritage.org/index/freedom-from-corruption
+# Hospital beds: Hospital beds (per 10 000 population)
+# Metadata: https://www.who.int/data/gho/indicator-metadata-registry/imr-details/97
+
 # Importação das bibliotecas
 
 library(tidymodels)
 library(tidyverse)
 library(ggrepel)
 library(skimr)
-library(MASS)
-library(dplyr)
 library(factoextra)
 library(plotly)
 library(cluster)
+library(dplyr)
 
 # Obtenção dos dados
 
-dados <- read.csv("../Index_Covid.csv")
+dados <- read.csv("C:/Users/chau_/OneDrive/Insper/2o T/Modelos_Preditivos_Avancado/08. Seminarios/Index_Covid.csv")
 
 view(dados)
+
+glimpse(dados)
+
+# Gráficos
+
+df <-dados[order(dados$Covid),]
+
+barplot(df$Covid, beside=TRUE, col=c("red"),  xlab = "Country",ylab = "Death rate (per 100 ths)", main = "Death Rate, by country", names.arg = df$Country.Name,cex.axis=0.8, cex.names=0.8,las=2)
+
+df1 <-dados[order(dados$Hospital.beds),]
+
+barplot(df1$Hospital.beds, beside=TRUE, col=c("blue"),  xlab = "Country",ylab = "Hospital beds rate", main = "Hospital beds rate (per 10 ths), by country", names.arg = df1$Country.Name,cex.axis=0.8, cex.names=0.8, horiz = FALSE, density = 200,las=2)
+
+df2 <- dados[order(dados$Handwashing),]
+
+barplot(df2$Handwashing, beside=TRUE, col=c("green"),  xlab = "Country",ylab = "Handwashing", main = "Handwashing rate, by country", names.arg = df1$Country.Name,cex.axis=0.8, cex.names=0.8, horiz = FALSE, density = 200,las=2)
 
 # Tratamento da base de dados
 
@@ -26,7 +50,7 @@ covid <- dados %>%
   as.data.frame() %>%
   scale()
 
-rownames(covid) <- dados$Country.Name
+rownames(dados) <- dados$Country.Name
 
 dados_df <- dados[,-1]
 
@@ -46,7 +70,7 @@ tibble(coord1 = dados_df$Handwashing,
        label = rownames(dados_df), 
        cluster = factor(cutree(hc, 5))) %>% 
   ggplot(aes(coord1, coord2)) + 
-  geom_text_repel(aes(label = label), size = 6) +
+  geom_text_repel(aes(label = label), size = 3) +
   geom_point(aes(color = cluster), size = 3, show.legend = FALSE) + 
   theme_bw()
 
@@ -106,7 +130,6 @@ auxiliar %>%
             wine = sum((wine - mean(wine))^2),
             total_litres_alcohol = sum((total_litres_alcohol - mean(total_litres_alcohol))^2)) %>% 
   mutate(within = beer + spirit + wine + total_litres_alcohol)
-
 # Bibliography
 
 https://coronavirus.jhu.edu/data/mortality
