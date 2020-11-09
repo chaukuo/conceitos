@@ -12,7 +12,7 @@ library(cluster)
 
 # Obtenção dos dados
 
-dados <- read.csv("C:/Users/chau_/OneDrive/Insper/2o T/Modelos_Preditivos_Avancado/08. Seminarios/Index_Covid.csv")
+dados <- read.csv("../Index_Covid.csv")
 
 view(dados)
 
