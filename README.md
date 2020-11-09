@@ -1,14 +1,108 @@
-# conceitos
-Trazendo alguns conceitos dos modelos estatísticos de machine learning, como modelo KNN, Baggning, Ridge e outros
+# Importação das bibliotecas
 
-O modelo KNN é um método não paramétrico, isto é, não há premissas acerca os dados a serem utilizados. Ele pode ser utilizado tanto para regressão quanto para classificação. Importante salientar que não é um modelo que aprende com a base de dados, mas cujos resultados derivam dos dados inseridos (lazy learning).
-O modelo consiste em calcular o beta mediante a mensuração da distância (Euclidiana) mais próxima de um ponto em relação a k-pontos. Então, por exemplo, se k = 3, o modelo captura os 3 pontos mais próximos ao dado-referência, e calcula a distância ponderada. 
-Ou seja, um ponto estará, assim, dentro de uma categoria pertencente aos vizinhos, e associados a um Y (variável independente).
-Portanto, se uma nova informação é incluída na base de dados, o algoritmo irá identificar os k pontos próximos, e trazer um valor.
-Esta abordagem necessita de 3 elementos:
-1. matriz com os preditores associados à base de treino
-2. matriz de dados a serem utilizados no erro teste
-3. o valor de k, isto é, o número de vizinhos a ser usado como classificador
-No entanto, como saber qual k utilizar? Três, cinco, nove ou mais? 
-Não existe um método específico para encontrar o valor ótimo de k. Uma medida seria a raiz quadrada do número de elementos da base de dados. Por exemplo, se há 25 dados, k será igual a 5.
-Ao final do cálculo de todas as distância, será formada uma linha que as interliga, sendo então possível calcular o erro quadrado médio somando a subtração da diferença entre o ponto y e a linha.
+library(tidymodels)
+library(tidyverse)
+library(ggrepel)
+library(skimr)
+library(MASS)
+library(dplyr)
+library(factoextra)
+library(plotly)
+library(cluster)
+
+# Obtenção dos dados
+
+dados <- read.csv("C:/Users/chau_/OneDrive/Insper/2o T/Modelos_Preditivos_Avancado/08. Seminarios/Index_Covid.csv")
+
+view(dados)
+
+# Tratamento da base de dados
+
+nome_linhas <- nrow(dados)
+nome_colunas <- ncol(dados)
+
+covid <- dados %>%
+  select_if(is.numeric) %>%
+  as.data.frame() %>%
+  scale()
+
+rownames(covid) <- dados$Country.Name
+
+dados_df <- dados[,-1]
+
+# Agrupamento hierárquico - complete
+
+hc <- hclust(dist(dados_df), method = "complete")
+
+fviz_dend(hc, 
+          k = 5,
+          main = "Dados",
+          color_labels_by_k = TRUE, 
+          horiz = TRUE,) + 
+  theme_void()
+
+tibble(coord1 = dados_df$Handwashing, 
+       coord2 = dados_df$Hospital.beds, 
+       label = rownames(dados_df), 
+       cluster = factor(cutree(hc, 5))) %>% 
+  ggplot(aes(coord1, coord2)) + 
+  geom_text_repel(aes(label = label), size = 6) +
+  geom_point(aes(color = cluster), size = 3, show.legend = FALSE) + 
+  theme_bw()
+
+# Agrupamento hierárquico - Single
+
+hc_s <- hclust(dist(dados_df), method = "single")
+
+fviz_dend(hc_s, 
+          k = 5,
+          main = "Dados",
+          color_labels_by_k = TRUE, 
+          horiz = TRUE,) + 
+  theme_void()
+
+tibble(coord1 = dados_df$Handwashing, 
+       coord2 = dados_df$Hospital.beds, 
+       label = rownames(dados_df), 
+       cluster = factor(cutree(hc_s, 5))) %>% 
+  ggplot(aes(coord1, coord2)) + 
+  geom_text_repel(aes(label = label), size = 6) +
+  geom_point(aes(color = cluster), size = 3, show.legend = FALSE) + 
+  theme_bw()
+
+# Agrupamento hierárquico - Centróide
+
+hc_c <- hclust(dist(dados_df), method = "centroid")
+
+fviz_dend(hc_c, 
+          k = 5,
+          main = "Dados",
+          color_labels_by_k = TRUE, 
+          horiz = TRUE,) + 
+  theme_void()
+
+tibble(coord1 = dados_df$Handwashing, 
+       coord2 = dados_df$Hospital.beds, 
+       label = rownames(dados_df), 
+       cluster = factor(cutree(hc_c, 5))) %>% 
+  ggplot(aes(coord1, coord2)) + 
+  geom_text_repel(aes(label = label), size = 6) +
+  geom_point(aes(color = cluster), size = 3, show.legend = FALSE) + 
+  theme_bw()
+
+# Método K-Means
+
+teste <- kmeans(dados_df, centers = 2)
+
+auxiliar <- tibble(cluster = teste$cluster) %>% 
+  bind_cols(as_tibble(dados_df))
+
+teste$withinss # para acessar a variável
+
+auxiliar %>% 
+  group_by(cluster) %>% 
+  summarise(beer = sum((beer - mean(beer))^2), 
+            spirit = sum((spirit - mean(spirit))^2), 
+            wine = sum((wine - mean(wine))^2),
+            total_litres_alcohol = sum((total_litres_alcohol - mean(total_litres_alcohol))^2)) %>% 
+  mutate(within = beer + spirit + wine + total_litres_alcohol)
