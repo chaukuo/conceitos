@@ -106,3 +106,10 @@ auxiliar %>%
             wine = sum((wine - mean(wine))^2),
             total_litres_alcohol = sum((total_litres_alcohol - mean(total_litres_alcohol))^2)) %>% 
   mutate(within = beer + spirit + wine + total_litres_alcohol)
+
+# Bibliography
+
+https://coronavirus.jhu.edu/data/mortality
+https://www.heritage.org/index/
+https://apps.who.int/gho/data/node.main.WSHHYGIENE?lang=en
+https://www.tutorialgateway.org/barplot-in-r-programming/
