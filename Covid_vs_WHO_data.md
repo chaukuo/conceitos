@@ -113,3 +113,4 @@ https://coronavirus.jhu.edu/data/mortality
 https://www.heritage.org/index/
 https://apps.who.int/gho/data/node.main.WSHHYGIENE?lang=en
 https://www.tutorialgateway.org/barplot-in-r-programming/
+http://howtoinr.weebly.com/
